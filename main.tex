@@ -1,0 +1,840 @@
+
+\documentclass{amsart}
+
+\usepackage{xypic}
+\usepackage{amssymb}
+\usepackage{dsfont}
+\usepackage{hyperref}
+
+\usepackage{pythonhighlight}
+
+\usepackage{caption}
+\usepackage{subcaption}
+
+% \textwidth=125mm \textheight=185mm \parindent=8mm \evensidemargin=0pt \oddsidemargin=0pt \frenchspacing
+
+
+\usepackage{comment}
+\usepackage{amsmath}
+\usepackage{enumitem} 
+% \usepackage{setspace} \onehalfspacing
+
+% \usepackage[fontsize=11pt]{scrextend}
+
+\usepackage{tikz-cd}
+
+\xyoption{all}
+
+\newif\iffurther
+\furthertrue
+
+\numberwithin{equation}{section}
+\numberwithin{figure}{section}
+\theoremstyle{plain}
+\newtheorem{thm}{Theorem}[section] %the resolution could also be [subsection]
+\newtheorem*{thm*}{Theorem}
+\newtheorem*{Kurosh}{The Kurosh Problem}
+\newtheorem{prop}[thm]{Proposition}
+\newtheorem{cor}[thm]{Corollary}
+\theoremstyle{definition}
+\newtheorem{algo}[thm]{Algorithm}
+\newtheorem{conj}[thm]{Conjecture}
+\newtheorem{defn}[thm]{Definition}
+\newtheorem{exer}[thm]{Exercise}
+\newtheorem{lem}[thm]{Lemma}
+\newtheorem{prob}[thm]{Problem}
+\newtheorem{notation}[thm]{Notation}
+\newtheorem{ques}[thm]{Question}
+\newtheorem{axiom}[thm]{Axiom}
+\theoremstyle{remark}
+\newtheorem{rem}[thm]{Remark}
+\newtheorem{claim}[thm]{Claim}
+\newtheorem{proper}[thm]{Property}
+\newtheorem{exmpl}[thm]{Example}
+\newtheorem{const}[thm]{Construction}
+\newtheorem{test}[thm]{Test}
+\newtheorem*{acknowledgement*}{Acknowledgement}
+
+\newcommand{\cupdot}{\mathbin{\mathaccent\cdot\cup}}
+\newcommand\suchthat{\;\ifnum\currentgrouptype=16 \middle\fi|\;}
+\newcommand\subjectto{\;:\;}
+
+\def\Ber{{\operatorname{Ber}}}
+\def\L{\mathcal{L}}
+\def\S{\mathcal{S}}
+\def\H{\mathcal{H}}
+\def\g{\mathfrak{g}}
+\def\Span{{\operatorname{Span}}}
+\def\Ker{{\operatorname{Ker}}}
+\def\Im{{\operatorname{Im}}}
+
+
+
+\newcommand{\commentt}[1]{\noindent\textup{\color{teal}\texttt{[#1]}}}
+\newcommand{\commenttt}[1]{\noindent\textup{\color{blue}\texttt{[#1]}}}
+
+\setcounter{section}{-1}
+
+\begin{document}
+\begin{center}
+\textbf{Mathematical Modeling of Tumor Growth and Drug Resistance:}
+\end{center}
+\title{An Analysis of the Log-Kill and Gompertzian Growth Models}
+\date{March 14th, 2025}
+\author{Renusree Chitilla, Sanjay Ram, Sam Tacheny}
+\maketitle
+
+\section{Abstract}
+This paper explores mathematical models to characterize tumor growth under the influence of a single drug, focusing on two cancer cell populations: wild-type (nonresistant) and resistant cells. We analyze the Log-kill model, which assumes exponential growth, and compare it to a Gompertzian growth model that incorporates a carrying capacity. Key findings reveal that resistant cells eventually dominate the tumor population, regardless of treatment timing. The drug-induced death rate significantly impacts wild-type cell dynamics, but long-term resistance is inevitable. These results underscore the challenges of single-drug therapies and highlight the need for alternative treatment strategies to combat drug resistance.
+
+% This paper focuses on implementing mathematical frameworks to characterize tumor growth under the impact of a single drug. Specifically, we model two cancer cell populations, the wild-type (nonresistant) cells and resistant cells. The models incorporate growth rate, natural death, mutation, and drug-induced cell death. By introducing treatment at a specific time, $t^*$, we examine how the drug alters the dynamics of these populations. We analyze the long-term behavior and effect of the drug-induced death rate on population growth for a simple Log-kill model, then compare this with numerical solutions to a model with Gompertzian growth.
+
+\section{Introduction}
+One of the most pressing challenges in oncology research today is understanding and combating tumor growth and drug resistance. Cancerous tumors demonstrate complex patterns influenced by growth rates, mutations, and therapeutic interventions [7]. Specifically, tumors do not respond well to treatment over a long period of time due to the proliferation of drug-resistant cells. This not only threatens patient survival but also complicates the design of effective treatments. To understand these issues and work toward a solution, researchers are developing robust mathematical models that capture tumor growth behavior under varying biological and therapeutic conditions.
+
+Mathematical modeling has become an essential tool for understanding tumor growth dynamics and optimizing treatment strategies especially when drug resistance has become a great obstacle in treatment methods. Our paper revisits an early model for tumor growth, as described in [5], which distinguishes between two populations of cancer cells: $N(t)$ is the population of wild-type cells and $R(t)$ is the population of resistant cells under the impact of a single drug. This is also known as the \textit{Log-kill} model, which assumes that a given dose of the drug kills the same fraction of tumor cells regardless of the current tumor size.
+
+Some of the main variables and terms present in the equations below are $L, D$ and $u$ which represent the birth, death, mutation rates, and $H$ is the rate of drug-induced death. We assume that $0 \leq D < L$, $0 < H$, and $0 < u \ll 1$. The drug is introduced at time $t^*$.
+
+\[
+\begin{array}{ll}
+\left\{
+\begin{aligned}
+    N'(t) &= (L-D)N(t)\\
+    R'(t) &= (L-D)R(t) + uN(t)
+\end{aligned}
+\right., & \quad t<t^* & \quad \text{\vspace{1em}}\\
+\left\{
+\begin{aligned}
+    N'(t) &= (L-D -H)N(t)\\
+    R'(t) &= (L-D)R(t) + uN(t)
+\end{aligned}
+\right., & \quad t \geq t^*
+\end{array}
+\]
+
+
+The model where $t < t^*$ above describes the pre-treatment phase. We assume that wild-type and resistant cells have the same birth and death rates, so each population grows at a rate $L - D$ proportional to the current population. Additionally, the population of resistant cells grows as wild-type cells naturally mutation, described by the $uN(t)$ term. We assume these mutations happen one-way due to the relative evolutionary fitness of the resistant cells.
+
+The model where $t \geq t^*$ above describes the post-treatment phase with the introduction of $H$, the drug-induced death rate. This term decreases the growth rate for $N(t)$, but leaves the growth of the resistant cells $R(t)$ unchanged. In this system, $N(t^*)$ and $R(t^*)$ are the initial conditions, which are the solutions of the pre-treatment phase where $t = t^*$. 
+
+Additionally, a \textit{Gompertzian} growth framework will also be studied here to reflect the slowing of tumor growth as it approaches a limiting size $K$. This is known as the Norton-Simons hypothesis, and was shown to be a better empirical fit to tumor growth in [1] and [2]. 
+
+\[
+\begin{array}{ll}
+\left\{
+\begin{aligned}
+    N'(t) &= (L-D)N(t)\ln(\frac{K}{N(t) + R(t)}) - uN(t)\\
+    R'(t) &= ((L-D)R(t) + uN(t))\ln(\frac{K}{N(t) + R(t)})\\
+\end{aligned}
+\right., & \quad t<t^* & \quad \text{\vspace{1em}}\\
+\left\{
+\begin{aligned}
+    N'(t) &= (L-D -H)N(t)\ln(\frac{K}{N(t) + R(t)}) - uN(t)\\
+    R'(t) &= ((L-D)R(t) + uN(t))\ln(\frac{K}{N(t) + R(t)})
+\end{aligned}
+\right. & \quad t \geq t^*
+\end{array}
+\]
+
+The major changes under this model are the introduction of a logarithmic term and a $-uN(t)$ \textit{exchange} term for the wild-type cells. The logarithmic term introduced in this equation causes the growth rates of both populations to slow as the total tumor population $P(t) = N(t) + R(t)$ approaches the carrying capacity $K$. The logarithm ensures that this decrease in the growth rate is not linear. Instead, as the population approaches the carrying capacity, the decrease in growth rate slows.
+
+At a high level, this new model changes the specific growth rate $GF$ (growth rate normalized by the current size of the tumor). For a single population $P$:
+
+\[
+    P'(t) = GF(P)\cdot P(t)
+\]
+
+With two populations, we instead define $GF(N,R)$, or the specific growth rate of given the populations $N$ and $R$. Rather than introduce a different growth rate for each cell type, we assume that the growth rate depends on total population of the tumor $P = N + R$. The Log-kill model assumes the specific growth rate is constant, whereas the Norton-Simons model assumes the specific growth rate decreases over time for both the pre and post-treatment phases. 
+
+Additionally, the term $- uN(t)$ accounts for the decrease in wild-type population arising from the mutations into resistant cells. This is akin to the treatment modeling for a single cell-type done in [1]. We did not account for this in the Log-kill model since it has a minimal effect on the model behavior. However, we will explore the importance of this term in the Gompertzian growth framework.
+
+% Now looking at the same first model but the $R'(t)$ growth where $t < t^*$, we can see that the resistant cells grow at the same rate as the wild-type cells. Additionally, the $u$ term is positive here, because when the mutations happen the wild-type become resistant cells, so we are in theory growing more of the resistant cells. Similar to the first model, the logarithmic term is also present here because the Gompertzian growth diminishes as the tumor approaches its limit which is defined by $K$.
+
+
+
+% In model 2 for the $N'(t)$ equation where $t < t^*$, which describes the post-treatment models, we can see that the only key difference is the addition of subtracting $H$ which is now introduced because the net growth rate of wild-type cells now includes a drug-induced death term, $H$, which reduces their population further.
+
+% Again in model 2 for the $R'(t)$ equation where $t \geq t^*$, which describes the post-treatment models, we notice that the $H$ term is not introduced here because resistant cells are unaffected by this drug. This is because since they are resistant to drug introduction, their dynamics will remain the same as we have observed for $t < t^*$.
+
+
+\section{Thesis}
+This project aims to fully analyze the Log-kill model for tumor growth and treatment response, examining its mathematical structure and behavior. We study the model dynamics using closed-form solutions and phase plane analysis. This allows us to determine the long-term composition of tumors and the impact of the drug on the growth of resistant and wild-type cells. We then briefly compare these behaviors to the altered model with Gompertzian growth, using numerical methods to visualize the two populations under this framework.
+
+% We first study the model's dynamics to understand how treatment affects cancer cell populations. Then we explore modifications to the model, including adjusting birth and death rates for resistant and non-resistant cells, redefining the growth in terms of the total population, as well as incorporating mutation dynamics where wild-type cells mutate into resistance cells. Additionally, we investigate how the timing of treatment initiation, $t^*$, relates to the tumor size using exponential growth assumptions to estimate $t^*$. By applying these modifications, we aim to explore how treatment strategies influence tumor progression, resistance development, and overall behavior of the model. 
+
+
+\section{Methods}
+
+%\textbf{TODO: explain math done in the next section, will remove some of the computations}
+%\begin{enumerate}
+%    \item Closed form solutions - eigenvalues/eigenvector solving, and general results for two distinct/repeated eigenvectors. (This is useful since it gets rid of a large page of math in results.)
+%    \item Fixed points - specifically, how is stability determined, what does this look like in the phase plane. (Explain unstable/saddle node in relation to eigenvalues.) Additionally, we have a case with repeated eigenvalues (see fixed point section for an explanation).
+%    \item Numerical solutions - explain how Runge-Kutta works, explain fourth-order error (e.g. order of $h^4$).
+%\end{enumerate}
+
+To analyze the Log-kill model and explore modifications to its structure, we employ a combination of analytical, numerical, and computational techniques. Our methodology consists of three primary components: (1) the mathematical formulation and base analysis of the Log-kill model, (2) modifications to the model to incorporate altered birth and death rates, mutation dynamics, and treatment timing, and (3) numerical simulations and bifurcation analysis to examine changes in model behavior.
+
+% \subsection{Exponential Growth} We begin by analyzing the naive Log-kill model proposed by Tomasetti and Levy. This model describes the growth of two populations, $N(t)$ and $R(t)$, where $N(t)$ represents the number of normal cells and $R(t)$ represents the number of resistant cells. The system of differential equations governing this model is given by:
+
+% \[
+% \begin{array}{ll}
+% \left\{
+% \begin{aligned}
+%     N'(t) &= (L-D)N(t)\\
+%     R'(t) &= (L-D)R(t) + uN(t)
+% \end{aligned}
+% \right., & \quad t<t^* & \quad \text{\vspace{1em}}\\
+% \left\{
+% \begin{aligned}
+%     N'(t) &= (L-D -H)N(t)\\
+%     R'(t) &= (L-D)R(t) + uN(t)
+% \end{aligned}
+% \right., & \quad t \geq t^*
+% \end{array}
+% \]
+% Here, $L$ represents the rate of cell birth, $D$ represents the rate of cell death, $H$ is the additional death rate due to treatment, and $u$ is the rate at which normal cells mutate into resistant cells. The time point $t^*$ represents the moment treatment is introduced, altering the dynamics of $N(t)$.
+
+\subsection{Closed Form Solution} To analyze the evolution of tumor cell populations over time, we model their growth using a system of coupled ordinary differential equations (ODEs). This system governs the behavior of wild-type and resistant cells before and after the introduction of treatment at time $t^*$. By solving these equations analytically by finding the eigenvalues and eigenvectors of the system matrix $A$, we derive closed-form solutions that describe the time-dependent behavior of both cell populations. The system can be expressed in matrix form as:
+\[
+\frac{d}{dt}x=Ax
+\]
+Where $A$ is a $2\times2$ system matrix that encodes the growth rates and mutation dynamics of the cell populations. The general approach to solving such systems relies on finding the eigenvalues and eigenvectors of $A$, which determine the structure of the solution. The solution form depends on whether the eigenvalues of $A$, denoted as $\lambda_1$ and $\lambda_2$, are repeated or distinct.
+
+\noindent
+\subsubsection{Case 1: Repeated Eigenvalues($\lambda_1=\lambda_2$)}
+If $A$ has a repeated eigenvalue, that is both eigenvalues are the same, it may not have two independent eigenvectors.  In this case, we need to introduce a generalized eigenvector $\eta$ to construct a complete solution, which takes the form: 
+\[
+x(t)=(C_1+C_2t)e^{\lambda t}\mathbf{v}+C_2e^{\lambda t}\eta
+\]
+Here, $\mathbf{v}$ is the single eigenvector, and the generalized eigenvector $\eta$ satisfies the condition $(A-\lambda I)\eta=\mathbf{v}$.
+
+\noindent
+\subsubsection{Case 2: Distinct Eigenvalues ($\lambda_1\not=\lambda_2$)} When $A$ has two distinct eigenvalues, there exist two linearly independent eigenvectors, allowing us to express the general solution as:
+\[
+x(t)=C_1e^{\lambda_1t}\mathbf{v}_1+C_2e^{\lambda_2t}\mathbf{v}_2
+\]
+Where $\mathbf{v_1}$ and $\mathbf{v_2}$ are the eigenvectors that correspond to $\lambda_1$ and $\lambda_2$. $C_1$ and $ C_2$ are constants determined by the initial conditions. This form of the solution represents a superposition of exponential growth or decay modes, depending on the signs of the eigenvalues.
+
+For the pre-treatment phase, the system exhibits one of these solution structures depending on the model parameters. When treatment is introduced a $t^*$, the system matrix is modified to reflect the increased death rate of the wild-type cells. This alters the eigenvalues of $A$ and potentially changes the nature of the solution. To ensure a smooth transition between the pre- and post-treatment dynamics ($t<t^*$ and $t\geq t^*$), the continuity conditions at $t^*$ will be enforced, allowing us to determine the constants for the post-treatment solution.
+
+% \[
+%     \frac{d}{dt}\begin{pmatrix}
+%         N_1\\R_1
+%     \end{pmatrix} = \begin{pmatrix}
+%         L-D&0\\
+%         u&L-D
+%     \end{pmatrix}\begin{pmatrix}
+%         N_1\\R_1
+%     \end{pmatrix} = A\mathbf{x}
+% \]
+% where,
+% \[
+% A = \begin{pmatrix}
+%         L-D&0\\
+%         u&L-D
+%     \end{pmatrix}
+% \]
+
+% Since $A$ is a lower triangular matrix, its eigenvalues are simply the diagonal entries, both equal to $L-D$. This means the general solutions will involve exponentials of $(L-D)t$. To solve for the eigenvectors, we solve:
+% \begin{align*}
+%     0 = (A-\lambda I)\mathbf{v} = \begin{pmatrix}
+%         0&0\\
+%         u&0
+%     \end{pmatrix}\begin{pmatrix}
+%         v_1\\v_2
+%     \end{pmatrix}
+% \end{align*}
+% so $\mathbf{v} = (0 \quad 1)$. Similarly,
+% \begin{align*}
+%     \mathbf{v} =
+%     \begin{pmatrix}
+%         0\\1
+%     \end{pmatrix} =  (A-\lambda I)\mathbf{\eta} = \begin{pmatrix}
+%         0&0\\
+%         u&0
+%     \end{pmatrix}
+%     \begin{pmatrix}
+%         \eta_1\\\eta_2
+%     \end{pmatrix}
+% \end{align*}
+% thus $\eta = (\frac{1}{u}\quad 0) + a(0 \quad 1)$, where $a$ is a free variable. We can ignore the contribution of the free variable since it is a scalar copy of the original eigenvector $\mathbf{v}$. A general solution then looks like
+% \begin{align*}
+%     N_1(t) &= \frac{C_2}{u}e^{(L-D)t}\\
+%     R_1(t) 
+%     &= C_1e^{(L-D)t} + C_2te^{(L-D)t}\\
+%     &= (C_1 + C_2t)e^{(L-D)t}
+% \end{align*}
+% where $C_1, C_2$ are constants determined by initial conditions. For $t \geq t^*$, we modify the matrix to include the effect of treatment:
+% \[
+% A = \begin{pmatrix}
+%         L-D-H&0\\
+%         u&L-D
+%     \end{pmatrix}
+% \]
+% This matrix now has two distinct eigenvalues: $\lambda_1 = L-D-H$ and $\lambda_2 = L-D$. We solve for the corresponding eigenvectors:
+% \begin{align*}
+%     0 = (A-\lambda_1 I)\mathbf{v}_1 = \begin{pmatrix}
+%         0&0\\
+%         u&H
+%     \end{pmatrix}\begin{pmatrix}
+%         v_1\\v_2
+%     \end{pmatrix}
+% \end{align*}
+% this results in $\mathbf{v}_1 = (\frac{H}{u} \quad -1)$. Similarly, solving for $\lambda_2$:
+% \begin{align*}
+%     0 = (A-\lambda_2 I)\mathbf{v}_2 = \begin{pmatrix}
+%         -H&0\\
+%         u&0
+%     \end{pmatrix}\begin{pmatrix}
+%         v_1\\v_2
+%     \end{pmatrix}
+% \end{align*}
+% which gives $\mathbf{v}_2 = (0 \quad 1)$. This gives the general solution after treatment:
+% \begin{align*}
+%     N_2(t) &= \frac{HK_1}{u}e^{(L-D-H)t}\\
+%     R_2(t) &= K_2e^{(L-D)t}-K_1e^{(L-D-H)t}
+% \end{align*}
+% where $K_1, K_2$ are constants determined by the initial conditions. Since the two models align at $t = t^*$, we can solve for $K_1, K_2$ in terms of $C_1, C_2$ . That is, we set up $N_1(t^*) = N_2(t^*)$ and $R_1(t^*) = R_2(t^*)$. This leads to:
+% \begin{align*}
+%     K_1 &= \frac{C_2}{H}e^{Ht^*}\\
+%     K_2 &= C_1 + C_2(t^*+\frac{1}{H})
+% \end{align*}
+% Bringing everything together, the final closed-form expressions are:
+% \[
+% \begin{array}{ll}
+% \left\{
+% \begin{aligned}
+%     N_1(t) &= \frac{C_2}{u}e^{(L-D)t}\\
+%     R_1(t) 
+%     &= C_1e^{(L-D)t} + C_2te^{(L-D)t}\\
+%     &= (C_1 + C_2t)e^{(L-D)t}
+% \end{aligned}
+% \right., & \quad t<t^* & \quad \text{\vspace{1em}}\\
+% \left\{
+% \begin{aligned}
+%     N_2(t) &= \frac{C_2}{u}e^{(L-D)t-H(t-t^*)}\\
+%     R_2(t) 
+%     &= (C_1 + C_2(t^*+\frac{1}{H}))e^{(L-D)t}-\frac{C_2}{H}e^{(L-D)t-H(t-t^*)}\\
+%     &= (C_1+C_2t^*+\frac{C_2}{H}(1-e^{-H(t-t^*)}))e^{(L-D)t}
+% \end{aligned}
+% \right. & \quad t \geq t^*
+% \end{array}
+% \]
+% This derivation ensures that the system transitions smoothly from pre-treatment to post-treatment dynamics.
+
+\subsection{Fixed Points and Stability Analysis} Understanding the fixed points of the system provides insight into the long-term behavior of tumor growth under different conditions. Fixed points occur where the population sizes remain constant over time, meaning the system reaches equilibrium. Stability analysis determines whether small perturbations around these fixed points grow or decay, shaping the overall dynamics of the model. By examining the eigenvalues of the system matrix, we classify the behavior of these fixed points and interpret their biological significance.
+
+The stability of a fixed point depends on the nature of the eigenvalues of the system matrix. If both eigenvalues are negative, the fixed point is stable, meaning small deviations return to equilibrium. If at least one eigenvalue is positive, the fixed point is unstable, meaning small perturbations will grow over time. The specific scenarios are as follows:
+
+\subsubsection{Case I: Repeated Eigenvalues} 
+\begin{itemize}
+    \item If the eigenvalues are repeated and positive, the fixed point is unstable, meaning any small change in population composition will lead to uncontrolled growth
+    \item If the eigenvalues are repeated and negative, the fixed point is stable, meaning any small deviation will decay back to equilibrium.
+\end{itemize}
+
+\subsubsection{Case II: Distinct Eigenvalues} 
+\begin{itemize}
+    \item If both eigenvalues are positive, the fixed point is an unstable node, meaning all small perturbations lead to exponential growth.
+    \item If one eigenvalue is positive and the other is negative, the system forms a saddle point (saddle-node), where trajectories are attracted along one direction and repelled along another. This suggests that some initial conditions lead to decay while others lead to unbounded growth.
+    \item If one of the eigenvalues is zero, the system exhibits neutral stability, meaning there is an infinite set of fixed points along a specific direction in the phase plane, where small perturbations neither grow nor decay.
+\end{itemize}
+By analyzing these cases, we can determine how different tumor compositions evolve over time and identify conditions under which treatment is effective in suppressing tumor growth. This classification also allows us to detect bifurcation points, which are values of system parameters where qualitative changes in stability occur. This helps with revealing critical thresholds for tumor eradication or resistance emergence.
+
+
+\subsection{Numerical Solutions: Runge-Kutta Method}
+
+To obtain numerical solutions for the system, we applied the fourth-order Runge-Kutta (RK4) method [4], which provides an efficient and accurate way to approximate solutions to ordinary differential equations. The RK4 method improves upon simpler methods like Euler's method by incorporating multiple intermediate estimates for each time step to achieve a higher accuracy.
+\subsubsection{Evaluation} The RK4 method computes the next value of a function $y(t)$ governed by $y' = f(t, y)$ using four weighted evaluations [4]:
+
+\[
+k_1 = f(t_n, y_n) \quad\quad\quad
+k_2 = f(t_n + \frac{h}{2}, y_n + \frac{h}{2} k_1)
+\]
+\[
+k_3 = f(t_n + \frac{h}{2}, y_n + \frac{h}{2} k_2) \quad\quad\quad
+k_4 = f(t_n + h, y_n + h k_3)
+\]
+These values are then combined to compute the next step:
+\[
+y_{n+1}=y_n+\frac{h}{6}(k_1+2k_2+2k_3+k_4)
+\]
+\subsubsection{Error Analysis} The RK4 method has an error term of order $O(h^4)$ per step, meaning that the global error accumulates at order $O(h^3)$. This makes RK4 significantly more accurate than Euler’s method, which has an error of $O(h^2)$. The choice of step size $h$ determines the trade-off between accuracy and computational efficiency, with smaller $h$ yielding more precise results at the cost of additional computation.
+
+In our implementation, we use RK4 to solve the coupled system of equations for $N(t)$ and $R(t)$ over a range of parameter values, allowing us to compare numerical approximations with analytical solutions and assess model behavior under different conditions.
+
+\section{Results} \label{Results}
+
+\subsection{Exponential Growth} We start by analyzing the Log-kill model [1].
+
+\[
+\begin{array}{ll}
+\left\{
+\begin{aligned}
+    N'(t) &= (L-D)N(t)\\
+    R'(t) &= (L-D)R(t) + uN(t)
+\end{aligned}
+\right., & \quad t<t^* & \quad \text{\vspace{1em}}\\
+\left\{
+\begin{aligned}
+    N'(t) &= (L-D -H)N(t)\\
+    R'(t) &= (L-D)R(t) + uN(t)
+\end{aligned}
+\right., & \quad t \geq t^*
+\end{array}
+\]
+
+% For $t < t^*$,
+% \begin{align*}
+%     N'(t) &= (L-D)N(t)\\
+%     R'(t) &= (L-D)R(t) + uN(t)
+% \end{align*}
+% For $t \geq t^*$,
+% \begin{align*}
+%     N'(t) &= (L-D -H)N(t)\\
+%     R'(t) &= (L-D)R(t) + uN(t)
+% \end{align*}
+
+\subsubsection{Closed Form}
+For this section, we denote the models for $t < t^*$ as $N_1(t)$ and $R_1(t)$ and the models for $t \geq t^*$ as $N_2(t)$ and $R_2(t)$. For $t < t^*$ we can rewrite the system as:
+\[
+    \frac{d}{dt}\begin{pmatrix}
+        N_1\\R_1
+    \end{pmatrix} = \begin{pmatrix}
+        L-D&0\\
+        u&L-D
+    \end{pmatrix}\begin{pmatrix}
+        N_1\\R_1
+    \end{pmatrix} = A\mathbf{x}
+\]
+$A$ has the repeated eigenvector $\lambda = L-D$ with multiplicity 2. The associated eigenvector is $\mathbf{v} = (0 \quad 1)$ and generalized eigenvector is $\eta = (\frac{1}{u} \quad 0)$. Therefore, a general solution looks like
+% We can determine a closed form solution based on the eigendecomposition of $A$. Since $A$ is a lower triangular matrix, its eigenvalues are the values on the diagonal, so $A$ has the repeated eigenvector $\lambda = L-D$ with multiplicity 2. The associated eigenvector $\mathbf{v}$ and generalized eigenvector $\eta$ are found below.
+
+% \begin{align*}
+%     0 = (A-\lambda I)\mathbf{v} = \begin{pmatrix}
+%         0&0\\
+%         u&0
+%     \end{pmatrix}\begin{pmatrix}
+%         v_1\\v_2
+%     \end{pmatrix}
+% \end{align*}
+% so $\mathbf{v} = (0 \quad 1)$. Similarly,
+% \begin{align*}
+%     \mathbf{v} =
+%     \begin{pmatrix}
+%         0\\1
+%     \end{pmatrix} =  (A-\lambda I)\mathbf{\eta} = \begin{pmatrix}
+%         0&0\\
+%         u&0
+%     \end{pmatrix}
+%     \begin{pmatrix}
+%         \eta_1\\\eta_2
+%     \end{pmatrix}
+% \end{align*}
+% so $\eta = (\frac{1}{u}\quad 0) + a(0 \quad 1)$, where $a$ is a free variable. We can ignore the contribution of the free variable since it is a scalar copy of the original eigenvector $\mathbf{v}$. A general solution then looks like
+\begin{align*}
+    N_1(t) &= \frac{C_2}{u}e^{(L-D)t}\\
+    R_1(t) 
+    &= (C_1 + C_2t)e^{(L-D)t}
+\end{align*}
+where $C_1, C_2$ are constants determined by the initial conditions. We can do a similar calculation to get the closed form for $t \geq t^*$, where the matrix 
+\[
+A = \begin{pmatrix}
+        L-D-H&0\\
+        u&L-D
+    \end{pmatrix}
+\]
+This now has two distinct eigenvalues: $\lambda_1 = L-D-H$ and $\lambda_2 = L-D$. The associated eigenvectors are $\mathbf{v}_1 = (\frac{H}{u} \quad -1)$ and $\mathbf{v}_2 = (0 \quad 1)$. This gives the general solution
+
+% \begin{align*}
+%     0 = (A-\lambda_1 I)\mathbf{v}_1 = \begin{pmatrix}
+%         0&0\\
+%         u&H
+%     \end{pmatrix}\begin{pmatrix}
+%         v_1\\v_2
+%     \end{pmatrix}
+% \end{align*}
+% so $\mathbf{v}_1 = (\frac{H}{u} \quad -1)$. Similarly,
+% \begin{align*}
+%     0 = (A-\lambda_2 I)\mathbf{v}_2 = \begin{pmatrix}
+%         -H&0\\
+%         u&0
+%     \end{pmatrix}\begin{pmatrix}
+%         v_1\\v_2
+%     \end{pmatrix}
+% \end{align*}
+% so $\mathbf{v}_2 = (0 \quad 1)$. This gives the general solution 
+\begin{align*}
+    N_2(t) &= \frac{HK_1}{u}e^{(L-D-H)t}\\
+    R_2(t) &= K_2e^{(L-D)t}-K_1e^{(L-D-H)t}
+\end{align*}
+where $K_1, K_2$ are constants determined by the initial conditions. We can solve for $K_1, K_2$ in terms of $C_1,C_2$ since the two models align at $t = t^*$. That is, $N_1(t^*) = N_2(t^*)$ and $R_1(t^*) = R_2(t^*)$. This tells us that
+\begin{align*}
+    K_1 &= \frac{C_2}{H}e^{Ht^*}\\
+    K_2 &= C_1 + C_2(t^*+\frac{1}{H})
+\end{align*}
+All together:
+\[
+\begin{array}{ll}
+\left\{
+\begin{aligned}
+    N_1(t) &= \frac{C_2}{u}e^{(L-D)t}\\
+    R_1(t) 
+    &= (C_1 + C_2t)e^{(L-D)t}
+\end{aligned}
+\right., & \quad t<t^* & \quad \text{\vspace{1em}}\\
+\left\{
+\begin{aligned}
+    N_2(t) &= \frac{C_2}{u}e^{(L-D)t-H(t-t^*)}\\
+    R_2(t) 
+    &= (C_1+C_2t^*+\frac{C_2}{H}(1-e^{-H(t-t^*)}))e^{(L-D)t}
+\end{aligned}
+\right. & \quad t \geq t^*
+\end{array}
+\]
+
+% \begin{align*}
+%     N_1(t) &= \frac{C_2}{u}e^{(L-D)t}\\
+%     R_1(t) 
+%     &= C_1e^{(L-D)t} + C_2te^{(L-D)t}\\
+%     &= (C_1 + C_2t)e^{(L-D)t}
+% \end{align*}
+% For $t \geq t^*$:
+% \begin{align*}
+%     N_2(t) &= \frac{C_2}{u}e^{(L-D)t-H(t-t^*)}\\
+%     R_2(t) 
+%     &= (C_1 + C_2(t^*+\frac{1}{H}))e^{(L-D)t}-\frac{C_2}{H}e^{(L-D)t-H(t-t^*)}\\
+%     &= (C_1+C_2t^*+\frac{C_2}{H}(1-e^{-H(t-t^*)}))e^{(L-D)t}
+% \end{align*}
+
+\subsubsection{Change in growth after $t^*$}
+
+Note that the drug-induced death rate $H$ only impacts the population growth for $N_2, R_2$ for $t \geq t^*$, which is to be expected. In the case of $N_2$, this closed form shows a clear decrease in growth rate as the coefficient in the exponential is reduced. This is easily interpretable in the differential version of the model.
+
+A more interesting analysis considers the growth rate of $R_2$ after treatment, since the differential equations are identical for $R_1$ and $R_2$. We can determine the growth rate by analyzing growth of the coefficient in front of $e^{(L-D)t}$, or the exponential growth term. After the drug is administered, we see that this coefficient now grows asymptotically (in terms of $1-e^{-H(t-t^*)}$) rather than linearly (in terms of $t$). As $t \to \infty$, the coefficient of growth for $R_2$ approaches $C_1 + C_2(t^* + \frac{1}{H})$. In contrast, the coefficient for $R_1$ is unbounded.
+
+This shows that the growth rate of $R(t)$ decreases after the drug is administered. This decrease does not come from a direct impact of the drug on the growth rate of the resistant cells, but rather a decrease in the number of mutating cells due to the reduced growth rate of $N(t)$.
+
+\subsubsection{Initial conditions}
+We can determine the value of the coefficients $C_0$ and $C_1$ subject to the initial conditions $N(0) = N_0 > 0$ and $R(0) = 0$. This corresponds to our tumor starting out as a population of only wild-type cells. This is equivalent to the starting conditions in [5]. In this case, $C_1 = 0$ and $C_2 = N_0u$. Therefore,
+\[
+\begin{array}{ll}
+\left\{
+\begin{aligned}
+    N_1(t) &= N_0e^{(L-D)t}\\
+    R_1(t) &= N_0ute^{(L-D)t}
+\end{aligned}
+\right., & \quad t<t^* & \quad \text{\vspace{1em}}\\
+\left\{
+\begin{aligned}
+    N_2(t) &= N_0e^{(L-D)t-H(t-t^*)}\\
+    R_2(t) &= N_0u(t^*+\frac{1}{H}(1-e^{-H(t-t^*)}))e^{(L-D)t}
+\end{aligned}
+\right. & \quad t \geq t^*
+\end{array}
+\]
+% Therefore, for $t < t^*$:
+% \begin{align*}
+%     N_1(t) &= N_0e^{(L-D)t}\\
+%     R_1(t) &= N_0ute^{(L-D)t}\\
+% \end{align*}
+% For $t \geq t^*$:
+% \begin{align*}
+%     N_2(t) &= N_0e^{(L-D)t-H(t-t^*)}\\
+%     R_2(t) &= N_0u(t^*+\frac{1}{H}(1-e^{-H(t-t^*)}))e^{(L-D)t}
+% \end{align*}
+Specific instances of this class of solutions are plotted in \ref{fig:closed_form}.
+
+% \begin{figure}
+%     \centering
+%     \includegraphics[width=0.7\linewidth]{graphics/closed_form_inc.png}
+%     \caption{Population growth for $N_0 = 1$, $t^* = 10$, $L = 1$, $D = 0.5$, $H = 0.25$, and $u = 0.01$.}
+%     \label{fig:closed-form-inc}
+% \end{figure}
+
+% \subsubsection{Relative growth}
+% Prove that the population of resistant cells always surpasses the population of wild-type cells (assuming we start with all wild-type).
+
+% When does this occur? Does it matter if it happens before/after $t^*$?
+
+\subsubsection{Long-term behavior}
+From the closed-form solutions above, we can see that the long-term behavior for $t < t^*$ has exponential growth for both $N(t)$ and $R(t)$, with $R(t) > N(t)$ after some amount of time. This can be seen by comparing the relative coefficients for the exponential $e^{(L-D)t}$ in the two models. The coefficient for $R(t)$ contains a linear component $t$ that eventually outpaces the fixed coefficient for $N(t)$.
+
+For $t \geq t^*$, we see the same exponential growth in $R(t)$ since the coefficient in front of the exponential is positive. Specifically, the coefficient asympotically approaches $N_0u(t^* + \frac{1}{H}) > 0$. However, the long-term behavior of $N(t)$ depends on the drug-induced death rate $H$.
+
+There are three cases based on the sign of the exponent in $e^{(L-D)t-H(t-t^*)}$. If $H < L-D$, then the coefficient in front of $t$ is positive, and $N(t)$ continues to grow exponentially after the drug is administered at time $t^*$ as shown in \ref{fig:closed-form-inc}. If $H = L - D$, then the coefficient in front of $t$ is 0, and $N(t)$ is constant for $t \geq t^*$. Specifically, $N(t) = N(t^*) = N_0e^{(L-D)t^*}$ for all $t \geq t^*$ as shown in \ref{fig:closed-form-const}. If $H > L-D$, then the coefficient in front of $t$ is negative, and $N(t)$ decays exponentially for $t \geq t^*$. That is, $N(t) \to 0$ as $t \to \infty$ as shown in \ref{fig:closed-form-dec}.
+
+\begin{figure}
+    \centering
+    \begin{subfigure}{.5\textwidth}
+      \centering
+      \includegraphics[width=\linewidth]{graphics/closed_form_inc.png}
+      \caption{$H = 0.25$}
+      \label{fig:closed-form-inc}
+    \end{subfigure}
+    \begin{subfigure}{.5\textwidth}
+      \centering
+      \includegraphics[width=\linewidth]{graphics/closed_form_const.png}
+      \caption{$H = 0.5$}
+      \label{fig:closed-form-const}
+    \end{subfigure}%
+    \begin{subfigure}{.5\textwidth}
+      \centering
+      \includegraphics[width=\linewidth]{graphics/closed_form_dec.png}
+      \caption{$H = 0.75$}
+      \label{fig:closed-form-dec}
+    \end{subfigure}
+    \caption{Population growth for $N_0 = 1$, $t^* = 10$, $L = 1$, $D = 0.5$, and $u = 0.01$.}
+    \label{fig:closed_form}
+\end{figure}
+
+% This shows that the value of $H$ controls the long term behavior of $N(t)$ for $t \geq t^*$. We can further analyze this using bifurcation diagrams. The fixed points of $N$ after the drug is administered occur either when $N = R = 0$ or when $H = L-D$, in which case the fixed points are all $N = -\frac{R}{u}H$. 
+
+\subsubsection{Fixed Points}
+We will first focus on the system for $t < t^*$. There is exactly one fixed point of this system, which occurs when $N = R = 0$. This corresponds to the case where there is no tumor. However, small perturbations from this fixed point can be interpreted as different proportional makeups of the starting tumor (e.g. the ratio of wild-type to resistant cells). Therefore, the stability of the fixed point can inform how the system functions with different starting conditions.
+
+% We have already shown that the long-term makeup of the tumor tends toward resistant cells, but depends on the drug-induced death rate $H$. Do we see similar behavior for different starting proportions?
+
+The behavior around the origin is again determined by the eigendecomposition of the matrix $A$. For $t < t^*$, we have a repeated eigenvalue $L-D > 0$. This gives an unstable trajectory along $\mathbf{v} = (0 \quad 1)$. The remaining trajectories pass through the origin parallel to this vector, but begin to `curve' around to face the opposite direction based on the generalized eigenvector $\mathbf{\eta} = (\frac{1}{u} \quad 0)$. For $0 < u \ll 1$ (or $u$ close to 0), the impact of the `curving' is minimal, and the local behavior is functionally equivalent to an unstable node. This is demonstrated in \ref{fig:phase_before_unstable}. However, the impact of the generalized eigenvectors can be seen far away from the origin; alternatively, we can visualize the impact close to the origin by increasing $u$ as shown in \ref{fig:phase_before_curve}.
+
+\begin{figure}
+    \centering
+    \begin{subfigure}{.5\textwidth}
+      \centering
+      \includegraphics[width=\linewidth]{graphics/phase_before.png}
+      \caption{$u = 0.01$}
+      \label{fig:phase_before_unstable}
+    \end{subfigure}%
+    \begin{subfigure}{.5\textwidth}
+      \centering
+      \includegraphics[width=\linewidth]{graphics/phase_before_curve.png}
+      \caption{$u = 0.5$}
+      \label{fig:phase_before_curve}
+    \end{subfigure}
+    \caption{Phase portraits for $t < t^*$ with $L = 1$, $D = 0.5$.}
+    \label{fig:phase_before}
+\end{figure}
+
+% \begin{figure}
+%     \centering
+%     \includegraphics[width=0.7\linewidth]{graphics/phase_before.png}
+%     \caption{Phase portrait for $t < t^*$ with $L=1$, $D=0.5$, and $u = 0.01$.}
+%     \label{fig:phase_before}
+% \end{figure}
+
+The system with $t \geq t^*$ has two classes of fixed points. There is the same fixed point at the origin, and an additional family of fixed points when $H = L-D$. This second family gives fixed points for all $N = -\frac{H}{u}R$. In this case, we do not plot a bifurcation diagram since the fixed points depend on the relationship between $N$ and $R$. Instead, we can analyze these in the phase plane.
+
+We can start by considering the fixed point at the origin for $H \neq L-D$. The two eigenvalues of the matrix $A$ are $\lambda_1 = L-D$ and $\lambda_2 = L-D-H$. If $H < L-D$, we have two positive eigenvalues, so the origin is an unstable fixed point. The vector field is plotted in \ref{fig:phase_after_unstable}. If $H > L-D$, we have two real eigenvalues of opposite signs, so this is a saddle node. The trajectories are stable along the eigenvector $\mathbf{v}_1 = (\frac{H}{u}\quad -1)$ and unstable along the eigenvector $\mathbf{v}_2 = (0\quad 1)$. The vector field is plotted in \ref{fig:phase_after_saddle}, with the line given by $\mathbf{v}_2$ in blue. This tells us that $H = L-D$ is a bifurcation value for the system since the fixed point at the origin changes stability.
+
+If $H = L-D$, one of our eigenvalues is 0. In this case, we get infinitely many unstable fixed points along the eigenvector $\eta = (\frac{H}{u}\quad-1)$ in the phase plane. Outside of the fixed points, the trajectories follow $\mathbf{v} = (0\quad 1)$. The vector field is plotted in \ref{fig:phase_after_inf}, where the blue line denotes the line of fixed points.
+
+\begin{figure}
+    \centering
+    \begin{subfigure}{.5\textwidth}
+      \centering
+      \includegraphics[width=\linewidth]{graphics/phase_after_unstable.png}
+      \caption{$H = 0.25$, $u = 0.01$}
+      \label{fig:phase_after_unstable}
+    \end{subfigure}%
+    \begin{subfigure}{.5\textwidth}
+      \centering
+      \includegraphics[width=\linewidth]{graphics/phase_after_saddle.png}
+      \caption{$H = 0.75$, $u = 0.05$}
+      \label{fig:phase_after_saddle}
+    \end{subfigure}
+    \begin{subfigure}{.5\textwidth}
+      \centering
+      \includegraphics[width=\linewidth]{graphics/phase_after_inf.png}
+      \caption{$H = 0.5$, $u = 0.05$}
+      \label{fig:phase_after_inf}
+    \end{subfigure}
+    \caption{Phase portraits for $t \geq t^*$ with $L = 1$, $D = 0.5$.}
+    \label{fig:phase}
+\end{figure}
+
+% \textbf{Interpretation:}
+% \begin{enumerate}
+%     \item We only care about the upper right-hand quadrant (where $N, R \geq 0$) in the physical context.
+%     \item We will never be close to the fixed point at the origin if we assume $t^* > 0$ (since we start with the first model). Similarly, the unstable fixed point line does not fall in the upper right-hand quadrant, so it does not mean much physically.
+% \end{enumerate}
+
+\subsection{Gompertzian Growth} We will now analyze the altered model with Gompertzian growth.
+\[
+\begin{array}{ll}
+\left\{
+\begin{aligned}
+    N'(t) &= (L-D)N(t)\ln(\frac{K}{N(t) + R(t)}) - uN(t)\\
+    R'(t) &= ((L-D)R(t) + uN(t))\ln(\frac{K}{N(t) + R(t)})\\
+\end{aligned}
+\right., & \quad t<t^* & \quad \text{\vspace{1em}}\\
+\left\{
+\begin{aligned}
+    N'(t) &= (L-D -H)N(t)\ln(\frac{K}{N(t) + R(t)}) - uN(t)\\
+    R'(t) &= ((L-D)R(t) + uN(t))\ln(\frac{K}{N(t) + R(t)})
+\end{aligned}
+\right. & \quad t \geq t^*
+\end{array}
+\]
+
+Recall that the $\ln(\frac{K}{N(t) + R(t)})$ term captures the restrained growth of the model subject to a carrying capacity $K$ on the total population $P = N + R$. Additionally, we introduced a $-uN(t)$ \textit{exchange} term to the equations for $N'(t)$ to account for the change in population caused by mutations. This was not strictly necessarily in the Log-kill model since these changes are minimal in comparison to the proliferation rate of the cells (given by $L-D$).
+
+However, with Gompertzarian growth, this term is required to simulate the continued mutation of cells as the total population approaches the carrying capacity. It is outside of the restrained growth term since this exchange happens regardless of the current total population. Without this term, the two populations settle at an equilibrium ratio as $N + R \to K$, which does not adequately explain the tumor behavior, as is demonstrated in \ref{fig:gompertz_stable}.
+
+\subsubsection{Numerical solutions}
+We compute numerical solutions to these equations using the \verb|ode45| solver in MATLAB over the range $[0,25]$, with $T = 1,000,000$ evenly-spaced steps. Our total error is on the order of $10^{-1}$. An example of the class of solutions is given in \ref{fig:gompertz_num}.
+
+\begin{figure}
+    \centering
+    \begin{subfigure}{.5\textwidth}
+      \centering
+      \includegraphics[width=\linewidth]{graphics/gompertz_stable.png}
+      \caption{No exchange term}
+      \label{fig:gompertz_stable}
+    \end{subfigure}%
+    \begin{subfigure}{.5\textwidth}
+      \centering
+      \includegraphics[width=\linewidth]{graphics/gompertz_num.png}
+      \caption{With exchange term}
+      \label{fig:gompertz_num}
+    \end{subfigure}
+    \caption{Numerical solutions to the Gompertzian model with $N(0) = 1$, $R(0) = 0$, $K = 100$, $t^* = 5$, $L = 1$, $D = 0.5$, $H = 0.25$, and $u = 0.05$.}
+    \label{fig:gompertz}
+\end{figure}
+
+We see the effect of the carrying capacity on the total population, which asymptotically approaches $K$. As this happens, the growth rates of $N(t)$ and $R(t)$ decrease similarly. However, we also see that the proportional makeup of the tumor begins to shift from wild-type to resistant cells without major changes to the total population. Considering the impact of the drug administered at $t^*$, we see the same initial decrease in the growth rate of $N(t)$ as with the Log-kill model.
+
+The bifurcation point for $H$ does not hold in this updated model due to the inclusion of the $-uN(t)$ term. For large enough $t$, we eventually have $uN(t) > (L-D -H)N(t)\ln(\frac{K}{N(t) + R(t)})$ as the total population approaches the carrying capacity, such that $N'(t) < 0$.
+
+\subsubsection{Long-term behavior}
+As $t \to \infty$, we eventually have $P(t) \to K$. This can be seen by considering the equation for $R'(t)$, which is constantly growing (since the term in front of the natural log is equivalent to the growth in the Log-kill model) but is capped by $P(t) = N(t) + R(t) = K$.
+
+Specifically, we will have $R(t) \to K$ and $N(t) \to 0$. We know that $R(t)$ will grow so long as $P(t) < K$. Since we established that there is some $t$ such that $N'(t) < 0$, the value of $N(t)$ will start to decrease over time. This allows $R(t)$ to continue growing, which keeping the total population relatively stable so that $N(t)$ continues to decay. The decay of $N(t)$ is lower bounded at $0$ since this causes $N'(t) = 0$. Therefore, the long-term distribution of the tumor population tends toward a population of $K$ resistant cells.
+
+Note that this long-term behavior is independent of the drug - that is, the added drug-induced death rate $H$ for $t > t^*$ does not change the final state of the populations as $t \to \infty$.
+
+% \textbf{Interpretations (for Discussion):}
+% \begin{enumerate}
+%     \item Gompertzian model better deals with the known growth capacity of tumors
+%     \item It also ensures that $N(t) \to 0$ and $R(t) \to K$ in the long term, which makes sense as the selective pressure from the drug will continue to convert wild-type to resistant cells after the capacity threshold is nearly achieved.
+%     \item Since the long-term behavior does not depend on the drug, there is a point where introducing the drug does not help anymore. Future analysis could consider the impact of $t^*$ on the total population growth rate to determine when the drug can still be useful.
+% \end{enumerate}
+
+\section{Discussion}
+% Rubric goal: For papers that are oriented more towards a mathematical model, questions to be
+% answered in this section include (i) what do the results mean physically?, (ii) how can
+% you be confident that your results are correct? (i.e., do your answers make physical
+% sense?), (iii) what is the significance of what has been accomplished?, and (iv) how
+% does the model agree or disagree with the results of other models?
+
+% Exponential model closed form:
+% \begin{enumerate}
+%     \item Showed that R(t) always outpaces N(t) over time, the model tends toward resistance. This makes sense since we know that selective pressure will drive the population to the composition of best fitness (evolutionary theory). In this case, that's being resistant.
+% \end{enumerate}
+
+% Fixed points of first model:
+% \begin{enumerate}
+%     \item We only care about the upper right-hand quadrant (where $N, R \geq 0$) in the physical context.
+%     \item For $t < t^*$, we see $N(t) < R(t)$ in the first quadrant by the slight 'curve' induced by the generalized eigenvector.
+%     \item We will never be close to the fixed point at the origin for $t \geq t^*$ if we assume $t^* > 0$ (since we start with the first model). However, it still gives a general idea of the behavior, and we still see $N(t) < R(t)$ over time
+%     \begin{enumerate}
+%         \item For the unstable point, it seems like we move equally in every direction. However, there is a slight trend toward $R(t)$ coming to the direction of two eigenvectors that leads to $R(t) > N(t)$ after some time
+%         \item For the saddle point, we see $R(t) \to \infty$ and $N(t) \to 0$ starting anywhere in the first quadrant.
+%         \item For the final phase plane, we only see growth in $R(t)$ - $N(t)$ stays constant as we found earlier.
+%     \end{enumerate}
+% \end{enumerate}
+
+% For Gompertzian model:
+% \begin{enumerate}
+%     \item Gompertzian model better deals with the known growth capacity of tumors
+%     \item It also ensures that $N(t) \to 0$ and $R(t) \to K$ in the long term, which makes sense as the selective pressure from the drug will continue to convert wild-type to resistant cells after the capacity threshold is nearly achieved.
+%     \item Since the long-term behavior does not depend on the drug, there is a point where introducing the drug does not help anymore. Future analysis could consider the impact of $t^*$ on the total population growth rate to determine when the drug can still be useful.
+%     \item We saw in the first model that the drug-induced death rate causes three growth types for N(t) after the drug is administered. This doesn't hold for Gompertz. Bifurcation analysis gives us this baseline understanding of how $L, D, H$ interact, but there is more to it.
+% \end{enumerate}
+
+The results of this study provide insight into the dynamics of tumor growth under different modeling assumptions. By analyzing both a Log-kill (exponential growth) model and a Gompertzian growth model, we gained a deeper understanding of how tumor composition shifts over time and how treatment affects the population of wild-type and resistant cells. The mathematical framework employed, including closed-form solutions and stability analysis, allows us to interpret these behaviors in a rigorous way.
+
+\subsubsection{Log-kill model and Selective Pressure} The closed-form solution of the Log-kill model reveals that the resistant cell population, $R(t)$, eventually outgrows the wild-type population, $N(t)$. This aligns with evolutionary theory, where selective pressure favors the population with the highest fitness. In this case, resistant cells survive the treatment while wild-type cells are suppressed, leading to a shift toward a fully resistant tumor over time. The model thus reinforces the well-documented clinical observation that treatment can inadvertently drive resistance.  
+
+Fixed-point analysis of the first model reinforces this conclusion. The only biologically meaningful region of interest is the first quadrant, where both $N$ and $R$ are nonnegative. Before treatment ($t<t^*$), trajectories in this region show a trend toward increasing $R$. After treatment ($t\geq t^*$), the system exhibits different types of behavior depending on the value of H:
+\begin{itemize}
+    \item If $H < L - D$, the wild-type cells continue to grow exponentially despite treatment.
+    \item If $H = L - D$, the wild-type population stabilizes, meaning treatment is strong enough to halt its growth but not to eradicate it.
+    \item If $H > L - D$, the wild-type cells decay exponentially, eventually leading to their elimination.
+\end{itemize}
+However, since resistant cells are not affected by treatment, they continue to grow, meaning that in all cases, \( R(t) \) eventually dominates.  
+
+\subsubsection{Gompertzian Growth and Its Implications} Incorporating Gompertzian growth alters the long-term behavior of the system by introducing a carrying capacity, $K$, which limits the total tumor population. This model better reflects biological reality, where tumors do not grow indefinitely but slow down as they reach physical constraints. A significant difference from the Log-kill model is that under Gompertzian growth, the long-term outcome is $N(t)\rightarrow 0$ and $R(t)\rightarrow K$, meaning that the tumor will ultimately be composed entirely of resistant cells. This supports the conclusion that treatment, even if initially effective at reducing tumor size, may fail in the long run due to the selection of resistant cells.  
+
+Additionally, bifurcation analysis of the drug-induced death rate $H$, which was central in the Log-kill model, does not hold in the same way under Gompertzian growth. In the Log-kill model, $H$ determined whether $N(t)$ grew, remained constant, or decayed. However, in the Gompertzian model, selective pressure drives wild-type cells to extinction regardless of $H$, meaning that at sufficiently long timescales, treatment may become ineffective. This suggests that early intervention strategies may be critical in preventing resistance before the tumor reaches its carrying capacity.  
+
+\subsubsection{Confidence in Results} The mathematical consistency of our approach provides strong confidence in the results. The eigenvalue analysis confirms the stability properties observed in numerical simulations, and the closed-form solutions align with expected biological behavior. The phase plane analysis further supports these findings by showing how trajectories evolve under different parameter values. Additionally, the numerical implementation using the Runge-Kutta method provides a secondary validation, demonstrating that the analytical solutions hold up under computational simulation.
+
+Additionally, the qualitative conclusions drawn from this model seem to be in agreement with established biological principles. The inevitability of resistance emergence aligns with known challenges in cancer treatment, where tumors often evolve to evade therapeutic effects. The Gompertzian model's predictions also reflects empirical observations that tumor growth slows as the total population reaches a physical or metabolic limit.
+
+\subsubsection{Significance of Findings} This study highlights the importance of considering both exponential and constrained growth models when analyzing tumor evolution. The Log-kill model provides clear insights into the role of mutation and treatment dynamics, while the Gompertzian model captures the effect of resource limitations. Together, they provide a more complete picture of how tumors evolve in response to treatment.
+
+The results emphasize that treatment strategies should account for the inevitability of resistance. Since the wild-type population tends to decline while the resistant population takes over, strategies focused solely on eliminating wild-type cells may ultimately be ineffective. Instead, alternative treatment approaches, such as adaptive therapy [6], where a combination of drugs and doses are used to maintain a balance between wild-type and resistant cells, could be explored as a potential solution.
+
+\subsubsection{Comparision to Other Models} The findings of this study do seem to align with previous mathematical models of tumor growth, like the Luria-Delbruck (LD) model [3]. While the LD model emphasizes the natural emergence of mutants due to random mutations, the Log-kill model highlights the role of selective pressure under treatment, predicting that resistant cells will eventually dominate the tumor population. Both models focus on the importance of random processes in shaping cell population dynamics, but the Log-kill model is particularly suited for studying tumor behavior under therapeutic interventions. Together, these models offer complementary perspectives: the LD model provides a foundation for understanding mutation dynamics, while the Log-kill model extends this understanding to the context of cancer treatment and resistance.
+
+\section{Conclusions}
+
+In this paper, we have considered the growth of tumor cells under the influence of a single drug. Specifically, we considered models for the populations of wild-type (nonresistant) cells $N$ and resistant cells $R$ over time. These dynamics change when the drug is introduced at time $t = t^*$, at which point we introduce a term for the drug-induced death rate $H$ in the population of wild-type cells. We performed an in-depth analysis of the Log-kill model proposed in [5]. We then compared the behavior to a model in which the total population growth of the tumor is Gompertzian, which is empirically shown to be a better fit.
+
+For the Log-kill model, closed-form equations and phase plane analysis around the single fixed point $(N=0, P=0)$ showed us that both populations grow exponentially before the drug is introduced. In addition, the population of resistant cells eventually overtakes the population of wild-type cells, regardless of when the drug is introduced. However, the specific value of the drug-induced death rate $H$ impacts the growth of wild-type cells for $t \geq t^*$. This population will (i) grow exponentially if $H < L-D$, (ii) remain stable if $H = L-D$, and (iii) decay exponentially if $H > L-D$.
+
+For the Gompertzian model, we saw that the total population growth begins to decline as the it reaches the carrying capacity $K$, unlike the exponential population growth in the Log-kill model. Due to the introduction of the exchange term $-uN(t)$ in the equations for $N'(t)$, the tumor composition trends toward entirely resistant cells. This agrees with the Log-kill model in the sense that the population of resistant cells eventually outnumbers the wild-type. This trend is independent of the value for $H$, although it still has an effect on the speed at which the model approaches this long-term state. This suggests that early intervention is crucial for controlling the tumor composition. Additionally, both models show that a single drug is not sufficient for controlling the long-term tumor population, which suggests alternative approaches such as adaptive therapy.
+
+
+
+% To summarize our findings and mathematical analysis, the main differences we saw between the two models, which was the Log-kill model and Gompertzian growth, is that the Log-kill model shows insights into how different kinds of mutations and various treatments, whereas the Gompertzian model highlights the impact of different types of resource limitations.
+
+% For the Log-kill model that we analyzed, we noticed that as time increases, $R(t) > N(t)$ at all times and both are growing at an exponential rate where $N(t)$ represents the wild type cells and $R(t)$ represents the resistant cells when $t < t^*$. In the other case, that $t \geq t^*$, we observe the same exponential growth for $R(t)$, but for $N(t)$ the growth depends on the drug-induced death rate of $H$. We observed the same results in the phase plane analysis that we did, where we saw that for the case where $H = 0.75$, and $t \geq t^*$, as time increases $N(t)$ decreases and $R(t)$ increases and eventually $R(t)$ will become greater than $N(t)$. 
+
+% For the Gomperzian model that we analyzed, we noticed in our results that the overall population trends toward $R(t)$, however, it doesn't grow indefinitely and is instead bounded by a carrying capacity value of K. For $N(t)$, similar to the Log-kill model that we had analyzed, the growth of $N(t)$ depends on $H$ since it still impacts the growth rate of $N(t)$ after we introduce the drug.
+\[
+%to get bibliography on its own page
+\]
+\section{Bibliography}
+\noindent
+[1] L Norton and R Simon, "Tumor size, sensitivity to therapy, and design of treatment schedules," Cancer Treat Rep. (1977).\\
+
+\noindent
+[2] L Norton and R Simon, "Growth curve of an experimental solid tumor following radiotherapy," Cancer Treat Rep. (1977).\\
+
+\noindent
+[3] I Rodriguez-Brenes et al., "Cellular replication limits in the Luria-Delbruck mutation model," Physica D: Nonlinear Phenomena (2016).\\
+
+\noindent
+[4] D Tan and Z Chen, "On a General Formula of Fourth Order Runge-Kutta Method," International Journal of Mathematical Sciences and Mathematics Education (2012).\\
+
+\noindent
+[5] C Tomasetti and D Levy, "An Elementary Approach to Modeling Drug Resistance in Cancer," Mathematical Biosciences and Engineering (2010).\\
+
+\noindent
+[6] J West et al., “Towards Multidrug Adaptive Therapy,” Cancer Research (2020).\\
+
+\noindent
+[7] X Guo et al., "The intricate dance of tumor evolution: Exploring immune escape, tumor migration, drug resistance, and treatment strategies," Biochimica et Biophysica Acta: Molecular Basis of Disease (2024).\\
+
+
+
+% Tomasetti, Cristian, and Doron Levy. “An Elementary Approach to Modeling Drug Resistance in Cancer.” Mathematical Biosciences and Engineering : MBE, U.S. National Library of Medicine, Oct. 2010, pmc.ncbi.nlm.nih.gov/articles/PMC3877932/pdf/nihms-538567.pdf\\
+
+
+% Norton L, Simon R. Tumor size, sensitivity to therapy, and design of treatment schedules. Cancer
+% Treat. Rep. 1977; 61:1307–1317. [PubMed: 589597]\\
+
+% Norton L, Simon R. The growth curve of an experimental solid tumor following radiotherapy. J.
+% Natl. Cancer Inst. 1977; 58:1735–1741. [PubMed: 194044]\\
+
+% Norton L, Simon R. The Norton-Simon hypothesis revisited. Cancer Treat. Rep. 1986; 70:163–
+% 169. [PubMed: 3510732]\\
+
+% Tan, Delin. On A General Formula of Fourth Order Runge-Kutta Method, 2010, www.msme.us/2012-2-1.pdf. \\
+
+% Ignacio A. Rodriguez-Brenes a b, et al. “Cellular Replication Limits in the Luria–Delbrück Mutation Model.” Physica D: Nonlinear Phenomena, North-Holland, 19 Apr. 2016
+
+
+\end{document}
+
